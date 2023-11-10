@@ -22,11 +22,11 @@ class ProductController extends Controller
     {
         $cartSession = session()->get('cart');
         $products = ($cartSession) ? Product::whereNotIn('id', $cartSession)->get() : Product::all();
-
-        return $request->ajax() ? response()->json($products) : view('index', ['allProducts' => $products]);
+        
+        return response()->json($products);
     }
 
-    public function cart(Request $request)
+    public function cart()
     {
 
         $cartSession = session()->get('cart');
@@ -39,15 +39,12 @@ class ProductController extends Controller
             }
 
             if ($products) {
-                return $request->ajax() ? response()->json($products) : view('cart', ['products' =>  $products, 'mail' => false, 'cartQuantity' => $cartQuantity]);
+                return response()->json($products);
             }
-        } else {
-            return view('cart', ['mail' => false, 'empty' =>  trans('messages.emptyCart')]);
-        }
+        } 
     }
-    public function store(Request $request, $id)
+    public function store($id)
     {
-        $id = $request->ajax() ? $request->input('id') : $id;
         $product = Product::findOrFail($id);
 
         if ($product) {
@@ -58,7 +55,7 @@ class ProductController extends Controller
             }
         }
 
-        return $request->ajax() ? response()->json(session('cartQuantity')) : redirect()->back();
+        return response()->json(session('cartQuantity'));
     }
     public function cartCheckout(Request $request, $id)
     {
@@ -83,6 +80,25 @@ class ProductController extends Controller
         }
 
         return $request->ajax() ? response()->json(['success' => true]) : redirect()->back();
+    }
+
+    public function deleteProductCart($id){
+        $cartSession = session()->get('cart');
+        $index = array_search($id, $cartSession);
+        session()->forget("cart.$index");
+        session()->forget("cartQuantity.$index");
+        return response()->json(["success"=> true]);
+    }
+
+    public function updateQuantity($id){
+        $quantity = $id;
+        $cartQuantity = session('cartQuantity');
+        foreach ($cartQuantity as $key => $value) {
+            if (isset($value[$id])) {
+                $cartQuantity[$key][$id] = $quantity;
+            }
+        }
+        session()->put('cartQuantity', $cartQuantity);
     }
 
     public function deleteProductFromDB(Request $request, $id)
@@ -238,14 +254,14 @@ class ProductController extends Controller
     public function translationWords()
     {
         $translate = [
-            'action' => 'action',
+            'action' => 'Action',
             'actionViewOrder' => 'View Order',
             'actionViewProduct' => 'Details Product',
             'add' => 'Add',
             'addProduct' => 'Add product',
             'category' => 'Category',
             'cart' => 'Go to cart',
-            'cartPage' => 'Cart',
+            'cartPage' => 'Cart Page',
             'checkout' => 'Checkout',
             'checkoutInformation' => 'Checkout Information',
             'comments' => 'Comments',
@@ -263,11 +279,12 @@ class ProductController extends Controller
             'id' => 'Id',
             'image' => 'Image',
             'insufficientStock' => 'The stock is insufficient.',
-            'index' => 'Index',
+            'index' => 'Index Page',
             'invalid' => 'Invalid credentials!',
             'login' => 'Login',
             'logout' => 'Logout',
             'name' => 'Name',
+            'nameShop' => 'Shop Online',
             'notOrders' => 'No orders found!',
             'order' => 'Order',
             'ordersPage' => 'Orders',
@@ -277,6 +294,7 @@ class ProductController extends Controller
             'productPage' => 'Product',
             'productsRecommended' => 'Products Recommended',
             'purchasedProducts' => 'Purchased Products',
+            'remove' => 'Remove',
             'setQuantity' => 'Set quantity',
             'save' => 'save',
             'seeOrder' => 'See the order',

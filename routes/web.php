@@ -17,14 +17,16 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', [ProductController::class, 'index'])->name('index');
-Route::get('/cart', [ProductController::class, 'cart'])->name('cart');
+Route::get('index', [ProductController::class, 'index'])->name('index');
+Route::get('cart', [ProductController::class, 'cart'])->name('cart');
 Route::get('login',  [AuthController::class, 'viewLogin'])->name('login');
 
 Route::post('addToCart/{id}', [ProductController::class, 'store'])->name('addToCart');
 Route::post('cartCheckout/{id}', [ProductController::class, 'cartCheckout'])->name('cartCheckout');
 Route::post('checkout', [OrdersController::class, 'checkout'])->name('checkout');
 Route::post('login', [AuthController::class, 'validateLogin'])->name('validateLogin');
+Route::post('deleteProductCart/{id}', [ProductController::class, 'deleteProductCart'])->name('deleteProductCart');
+Route::post('updateQuantity', [ProductController::class,'updateQuantity'])->name('updateQuantity');
 
 Route::group(['middleware' => ['customAuth']], function () {
     Route::get('orders', [OrdersController::class, 'viewOrders'])->name('orders');
