@@ -1,11 +1,15 @@
 <script>
-import Index from './pages/index.vue'
-import Cart from './pages/Cart.vue'
+import Index from './pages/Index.vue';
+import Cart from './pages/Cart.vue';
+import Login from './pages/Login.vue';
+import Products from './pages/Products.vue';
 
 
 const routes = {
     '/': Index,
-    '/cart': Cart
+    '/cart': Cart,
+    '/login' : Login,
+    '/products' : Products
 }
 
 export default {
@@ -28,7 +32,5 @@ export default {
 </script>
 
 <template>
-    <a href="#/">Index</a> |
-    <a href="#/cart">Cart</a> |
     <component :is="currentView" />
 </template>

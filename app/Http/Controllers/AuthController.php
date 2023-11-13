@@ -26,6 +26,15 @@ class AuthController extends Controller
 
     public function validateLogin(Request  $request)
     {
+
+        if($request['adminMail'] === Config::get('credentialsAdmin.adminEmail') && $request['adminPassword'] === Config::get('credentialsAdmin.adminPassword')){
+            session(['admin' => true]);
+            return response()->json(['admin' => true]);
+        }else{
+            return response()->json(['admin' => false, 'message' => 'Invalid credentials!']);
+        }
+
+        
         if($request->ajax()){
             $adminMail = Config::get('credentialsAdmin.adminEmail');
             $adminPassword = Config::get('credentialsAdmin.adminPassword');
@@ -48,5 +57,6 @@ class AuthController extends Controller
         } else {
             return $request->ajax() ? response()->json('error') : redirect()->back()->with('error', trans('messages.invalid'));
         }
+        
     }
 }

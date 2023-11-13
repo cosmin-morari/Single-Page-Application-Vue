@@ -11,7 +11,7 @@
                 <td>{{ translate.action }}</td>
             </tr>
         </thead>
-        <tbody v-for="item in productsIndex" :key="item.id">
+        <tbody v-for="item in products" :key="item.id">
             <tr>
                 <td>{{ item.id }} </td>
                 <td><img :src="`http://localhost/training/Single-Page-Application-Vue/storage/app/public/photos/${item.imageSource}`"
@@ -24,45 +24,28 @@
 
         </tbody>
     </table>
-    <a href="#/cart">{{ translate.cart }}</a>
 </template>
 
 <script>
-
-export default {
-    data() {
-        return {
-            productsIndex: '',
-            translate: '',
+export default{
+    data(){
+        return{
+            products: '',
+            translate: ''
         }
     },
-    methods: {
-        async addToCart(productId) {
-            try {
-                const response = await fetch(`addToCart/${productId}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    },
-                })
-            } catch (err) {
-                return;
-            }
-        },
-    },
-    created() {
-        fetch('index')
+    created(){
+        fetch('products')
             .then(response => response.json())
             .then(data => {
-                this.productsIndex = data
-            })
-        fetch('/api/translation')
+                this.products = data
+            }),
+            fetch('/api/translation')
             .then(response => response.json())
             .then(data => {
                 this.translate = data
             })
     }
+   
 }
-
 </script>

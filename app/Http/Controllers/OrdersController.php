@@ -17,7 +17,8 @@ class OrdersController extends Controller
     public function viewOrders(Request $request)
     {
         $data = Order::with('products')->get();
-        return $request->ajax() ? response()->json($data) : view('orders', ['data' => $data]);
+        
+        return response()->json($data);
     }
 
     public function viewOrder(Request $request, $id)
@@ -32,23 +33,22 @@ class OrdersController extends Controller
         $idProductsInCart = session()->get('cart');
         $cartQuantity = session()->get('cartQuantity');
         $products = Product::whereIn('id', $idProductsInCart)->get();
-
+       
         if ($products->isEmpty()) {
             throw ValidationException::withMessages([
                 'cartError' => [trans('messages.error')],
             ])->status(422);
         }
         try {
-
-            $toMail = $request->input('contactDetails');
+            $toMail = $request['mail'];
             Mail::to(config('credentialsAdmin.adminEmail'))->send(new CheckoutMail($products, $toMail));
 
             // insert order table
             $order = new Order;
             $order->date = now();
-            $order->name = $request->input('name');
-            $order->contactDetails = $request->input('contactDetails');
-            $order->comments = $request->input('comments');
+            $order->name = $request['name'];
+            $order->contactDetails = $request['mail'];
+            $order->comments = $request['comments'];
             $order->save();
 
             // insert pivot table
@@ -67,12 +67,11 @@ class OrdersController extends Controller
         }
         session()->forget('cartQuantity');
         session()->forget('cart');
-        return $request->ajax() ? response()->json(['succes' => true]) : redirect()->route('index');
     }
 
     public function productsView(Request $request)
     {
         $products = Product::all();
-        return $request->ajax() ? response()->json($products) : view('products', ['allProducts' => $products]);
+        return response()->json($products);
     }
 }

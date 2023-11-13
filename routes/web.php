@@ -26,7 +26,7 @@ Route::post('cartCheckout/{id}', [ProductController::class, 'cartCheckout'])->na
 Route::post('checkout', [OrdersController::class, 'checkout'])->name('checkout');
 Route::post('login', [AuthController::class, 'validateLogin'])->name('validateLogin');
 Route::post('deleteProductCart/{id}', [ProductController::class, 'deleteProductCart'])->name('deleteProductCart');
-Route::post('updateQuantity', [ProductController::class,'updateQuantity'])->name('updateQuantity');
+Route::post('updateQuantity/{id}', [ProductController::class,'updateQuantity'])->name('updateQuantity');
 
 Route::group(['middleware' => ['customAuth']], function () {
     Route::get('orders', [OrdersController::class, 'viewOrders'])->name('orders');

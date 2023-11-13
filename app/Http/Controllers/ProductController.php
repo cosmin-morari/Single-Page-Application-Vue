@@ -90,8 +90,8 @@ class ProductController extends Controller
         return response()->json(["success"=> true]);
     }
 
-    public function updateQuantity($id){
-        $quantity = $id;
+    public function updateQuantity(Request $request, $id){
+        $quantity = $request[0];
         $cartQuantity = session('cartQuantity');
         foreach ($cartQuantity as $key => $value) {
             if (isset($value[$id])) {
@@ -99,6 +99,7 @@ class ProductController extends Controller
             }
         }
         session()->put('cartQuantity', $cartQuantity);
+        return response()->json(["success"=> true]);
     }
 
     public function deleteProductFromDB(Request $request, $id)
