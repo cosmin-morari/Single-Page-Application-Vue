@@ -10,6 +10,13 @@ use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {   
+    public function statusAdmin(){
+        if (session('admin')){
+            return response()->json(['admin' => true]);
+        }else{
+            return response()->json(['admin' => false]);
+        }
+    }
     public function logoutAdmin(Request $request)
     {
         session()->forget('admin');

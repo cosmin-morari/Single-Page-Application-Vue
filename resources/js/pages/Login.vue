@@ -1,32 +1,32 @@
 <template>
     <div class="container">
-        <h3>{{translate.login}}</h3>
+        <h3>{{ translate.login }}</h3>
         <input type="text" name="adminMail" class="adminMail" :placeholder="translate.userName" v-model="form.adminMail">
         <br><br>
-        <input type="password" name="adminPassword" class="adminPassword" :placeholder="translate.password" v-model="form.adminPassword">
+        <input type="password" name="adminPassword" class="adminPassword" :placeholder="translate.password"
+            v-model="form.adminPassword">
         <br><br>
-        <div style="color:red" class="error adminMail">{{invalidCredentials}}</div>
-        <button @click="login" type="submit">{{translate.login}}</button>
+        <div style="color:red" class="error adminMail">{{ invalidCredentials }}</div>
+        <button @click="login" type="submit">{{ translate.login }}</button>
     </div>
 </template>
 
 <script>
 
 export default {
-    data (){
+    data() {
         return {
             translate: '',
-            form : {
-                adminMail : '',
-                adminPassword : ''
-            }, 
+            form: {
+                adminMail: '',
+                adminPassword: ''
+            },
             invalidCredentials: '',
         }
     },
     methods: {
-        
-        async login(){
-            try{
+        async login() {
+            try {
                 const response = await fetch('login', {
                     method: 'POST',
                     headers: {
@@ -35,23 +35,30 @@ export default {
                     },
                     body: JSON.stringify(this.form)
                 }).then(response => response.json())
-                        .then(data => {
-                                this.invalidCredentials = data.message
-                            if(data.admin){
-                                window.location.hash ='/products'
-                            }
-                })
-            }catch (err) {
+                    .then(data => {
+                        this.invalidCredentials = data.message
+                        if (data.admin) {
+                            window.location.hash = '/products'
+                        }
+                    })
+            } catch (err) {
                 return;
             }
         }
     }
     ,
-    created(){
+    created() {
         fetch('/api/translation')
             .then(response => response.json())
             .then(data => {
                 this.translate = data
+            }),
+        fetch('statusAdmin')
+            .then(response => response.json())
+            .then(data => {
+                if(data.admin){
+                    window.location.hash = '/products' 
+                }
             })
     }
 }

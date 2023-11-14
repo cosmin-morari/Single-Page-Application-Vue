@@ -3,13 +3,15 @@ import Index from './pages/Index.vue';
 import Cart from './pages/Cart.vue';
 import Login from './pages/Login.vue';
 import Products from './pages/Products.vue';
+import Product from './pages/Product.vue';
 
 
 const routes = {
     '/': Index,
     '/cart': Cart,
     '/login' : Login,
-    '/products' : Products
+    '/products' : Products,
+    '/product' : Product
 }
 
 export default {

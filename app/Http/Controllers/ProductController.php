@@ -22,7 +22,7 @@ class ProductController extends Controller
     {
         $cartSession = session()->get('cart');
         $products = ($cartSession) ? Product::whereNotIn('id', $cartSession)->get() : Product::all();
-        
+
         return response()->json($products);
     }
 
@@ -41,7 +41,7 @@ class ProductController extends Controller
             if ($products) {
                 return response()->json($products);
             }
-        } 
+        }
     }
     public function store($id)
     {
@@ -82,15 +82,17 @@ class ProductController extends Controller
         return $request->ajax() ? response()->json(['success' => true]) : redirect()->back();
     }
 
-    public function deleteProductCart($id){
+    public function deleteProductCart($id)
+    {
         $cartSession = session()->get('cart');
         $index = array_search($id, $cartSession);
         session()->forget("cart.$index");
         session()->forget("cartQuantity.$index");
-        return response()->json(["success"=> true]);
+        return response()->json(["success" => true]);
     }
 
-    public function updateQuantity(Request $request, $id){
+    public function updateQuantity(Request $request, $id)
+    {
         $quantity = $request[0];
         $cartQuantity = session('cartQuantity');
         foreach ($cartQuantity as $key => $value) {
@@ -99,13 +101,13 @@ class ProductController extends Controller
             }
         }
         session()->put('cartQuantity', $cartQuantity);
-        return response()->json(["success"=> true]);
+        return response()->json(["success" => true]);
     }
 
-    public function deleteProductFromDB(Request $request, $id)
+    public function deleteProductFromDB($id)
     {
         Product::firstOrFail('id')->destroy($id);
-        return $request->ajax() ? response()->json(['message' => 'The product has been deleted.']) : redirect()->back();
+        return response()->json(['message' => 'The product has been deleted.']);
     }
 
     public function update(Request $request)
@@ -170,7 +172,33 @@ class ProductController extends Controller
 
     public function storeProduct(Request $request,)
     {
+        dd($request);
         $product = new Product;
+        $validator = Validator::make($request->all(), [
+            'title' => 'required',
+            'description' => 'required',
+            'price' => 'required|integer',
+            'file' => 'required',
+            'category' => 'required'
+        ]);
+
+        if (!$validator->passes()) {
+            return response()->json(['status' => 0, 'error' => $validator->errors()->toArray()]);
+        } else {
+            $image = $request->file;
+            $imageExtension = time() . '-' . $request->file->getClientOriginalName();
+            
+            $newImageName = time() . '-' . $request->title . '.' . $imageExtension;
+            $image->move(public_path('storage/photos'), $newImageName);
+
+            $data = [
+                    'title' => $request->title,
+                    'description' => $request->description,
+                    'price' => $request->price,
+                    'imageSource' => $newImageName,
+                    'category' => $request->category
+                ];
+        }
 
         if ($request->ajax()) {
 
@@ -220,10 +248,10 @@ class ProductController extends Controller
         }
     }
 
-    public function editProductView(Request $request, $id)
+    public function editProductView($id)
     {
         $product = Product::findOrFail($id);
-        return $request->ajax() ? response()->json($product) : view('product', ['product' => $product, 'destination' => 'editProduct']);
+        return response()->json(['products' => $product]);
     }
 
     public function addProductView(Request $request)
@@ -233,17 +261,17 @@ class ProductController extends Controller
 
     public function detailsProduct(Request $request, $id)
     {
-        
+
         $product = Product::findOrFail($id);
         $category = $product->category;
-        $sameCategoryproducts = Product::select('products.*')    
-                                ->where('category', $category)
-                                ->where('id', '!=', $id)
-                                ->selectRaw('(SELECT SUM(quantity) FROM order_product WHERE order_product.product_id=products.id) as total_quantity')
-                                ->orderBy('total_quantity','desc')
-                                ->limit(5)
-                                ->get();
-         
+        $sameCategoryproducts = Product::select('products.*')
+            ->where('category', $category)
+            ->where('id', '!=', $id)
+            ->selectRaw('(SELECT SUM(quantity) FROM order_product WHERE order_product.product_id=products.id) as total_quantity')
+            ->orderBy('total_quantity', 'desc')
+            ->limit(5)
+            ->get();
+
         $data = [
             'product' => $product,
             'sameCategoryproducts' => $sameCategoryproducts
@@ -287,11 +315,12 @@ class ProductController extends Controller
             'name' => 'Name',
             'nameShop' => 'Shop Online',
             'notOrders' => 'No orders found!',
+            'notProductsInDB' => 'Not products in database',
             'order' => 'Order',
             'ordersPage' => 'Orders',
             'password' => 'Password',
             'price' => 'Price',
-            'productsPage' => 'Products',
+            'productsPage' => 'Products Page',
             'productPage' => 'Product',
             'productsRecommended' => 'Products Recommended',
             'purchasedProducts' => 'Purchased Products',
