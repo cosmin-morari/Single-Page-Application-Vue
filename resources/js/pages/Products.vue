@@ -1,7 +1,10 @@
 <template>
     <h1>{{ translate.productsPage }}</h1>
-    <button @click="logoutAdmin()">{{ translate.logout }}</button>
-    <a href="#/product">{{ translate.addProduct }}</a>
+    <div class="navbar" style="display:flex; width:100%; justify-content:space-around;">
+        <a href="#/product">{{ translate.addProduct }}</a>
+        <a href="#/orders">{{ translate.ordersPage }}</a>
+        <button @click="logoutAdmin()">{{ translate.logout }}</button>
+    </div>
     <br>
     <br>
     <table border="1" v-if="products">
@@ -18,7 +21,7 @@
         <tbody v-for="item in products" :key="item.id">
             <tr>
                 <td>{{ item.id }} </td>
-                <td><img :src="`http://localhost/training/Single-Page-Application-Vue/storage/app/public/photos/${item.imageSource}`"
+                <td><img :src="`http://localhost/training/Single-Page-Application-Vue/public/storage/photos/${item.imageSource}`"
                         alt=""></td>
                 <td>{{ item.title }}</td>
                 <td>{{ item.description }}</td>
@@ -43,7 +46,7 @@ export default {
     },
     methods: {
         async logoutAdmin() {
-            try{
+            try {
                 const response = await fetch('logoutAdmin', {
                     method: 'POST',
                     headers: {
@@ -52,24 +55,24 @@ export default {
                     },
                 })
                 window.location.hash = '/login';
-            }catch(err){
+            } catch (err) {
                 return;
             }
         },
-        async deleteProduct(product){
-            try{
+        async deleteProduct(product) {
+            try {
                 const response = await fetch(`deleteProduct/${product}`, {
                     method: 'POST',
                     headers: {
-                        'Content-Type' : 'application/json',
+                        'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                     }
                 })
-            }catch(err){
+            } catch (err) {
                 return;
             }
         },
-        editProduct(product){
+        editProduct(product) {
             window.location.hash = '/product'
             window.productEdit = product
         }

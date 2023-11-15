@@ -110,69 +110,28 @@ class ProductController extends Controller
         return response()->json(['message' => 'The product has been deleted.']);
     }
 
-    public function update(Request $request)
+    public function update(Request $request, $id)
     {
-        $id = $request->ajax() ? $request->id : $request->id;
+        $id = $request->id;
         $product = Product::findOrFail($id);
+        $image = $request->file;
+        $newImageName = time() . '-' . $image->getClientOriginalName();
+        $image->move(public_path('storage/photos'), $newImageName);
 
-        if ($request->ajax()) {
+        $data = [
+            'title' => $request->title,
+            'description' => $request->description,
+            'price' => $request->price,
+            'category' => $request->category
+        ];
+        $product->fill($data);
+        $product->save();
 
-            $validator = Validator::make($request->all(), [
-                'title' => 'required',
-                'description' => 'required',
-                'price' => 'required|numeric',
-                'category' => 'required|string',
-                'file' => 'required|image'
-            ]);
-
-            if (!$validator->passes()) {
-                return response()->json(['status' => 0, 'error' => $validator->errors()->toArray()]);
-            } else {
-
-                $title = $request->title;
-                $description = $request->description;
-                $price = $request->price;
-
-                $image = $request->file('file');
-                $imageExtension = $image->getClientOriginalExtension();
-                $newImageName = time() . '-' . $request->title . '.' . $imageExtension;
-                $image->move(public_path('storage/photos'), $newImageName);
-
-                $data = [
-                    'title' => $request->title,
-                    'description' => $request->description,
-                    'price' => $request->price,
-                    'imageSource' => $newImageName
-                ];
-
-                $product->fill($data);
-                $product->save();
-                return response()->json(['message' => 'The product has been successfully updated.']);
-            }
-        } else {
-
-            $title = $request->title;
-            $description = $request->description;
-            $price = $request->price;
-            $newImageName = time() . '-' . $request->title . '.' . $request->image->extension();
-            $request->image->move(public_path('storage/photos'), $newImageName);
-            $data = [
-                'title' => $title,
-                'description' => $description,
-                'price' => $price,
-                'category' => $request->category,
-                'imageSource' => $newImageName
-            ];
-            $product->fill($data);
-            $product->save();
-
-            return redirect()->route('products');
-        }
+        return response()->json(['status' => true]);
     }
 
-    public function storeProduct(Request $request,)
+    public function storeProduct(Request $request)
     {
-        dd($request);
         $product = new Product;
         $validator = Validator::make($request->all(), [
             'title' => 'required',
@@ -186,65 +145,20 @@ class ProductController extends Controller
             return response()->json(['status' => 0, 'error' => $validator->errors()->toArray()]);
         } else {
             $image = $request->file;
-            $imageExtension = time() . '-' . $request->file->getClientOriginalName();
-            
-            $newImageName = time() . '-' . $request->title . '.' . $imageExtension;
+            $newImageName = time() . '-' . $image->getClientOriginalName();
             $image->move(public_path('storage/photos'), $newImageName);
 
-            $data = [
-                    'title' => $request->title,
-                    'description' => $request->description,
-                    'price' => $request->price,
-                    'imageSource' => $newImageName,
-                    'category' => $request->category
-                ];
-        }
-
-        if ($request->ajax()) {
-
-            $validator = Validator::make($request->all(), [
-                'title' => 'required',
-                'description' => 'required',
-                'price' => 'required|integer',
-                'file' => 'required|image',
-                'category' => 'required'
-            ]);
-
-            if (!$validator->passes()) {
-                return response()->json(['status' => 0, 'error' => $validator->errors()->toArray()]);
-            } else {
-                $image = $request->file('file');
-                $imageExtension = $image->getClientOriginalExtension();
-                $newImageName = time() . '-' . $request->title . '.' . $imageExtension;
-                $image->move(public_path('storage/photos'), $newImageName);
-
-                $data = [
-                    'title' => $request->title,
-                    'description' => $request->description,
-                    'price' => $request->price,
-                    'imageSource' => $newImageName,
-                    'category' => $request->category
-                ];
-
-                $product->fill($data);
-                $product->save();
-
-                return response()->json(['message' => $data]);
-            }
-        } else {
-            $newImageName = time() . '-' . $request->title . '.' . $request->image->extension();
-            $request->image->move(public_path('storage/photos'), $newImageName);
             $data = [
                 'title' => $request->title,
                 'description' => $request->description,
                 'price' => $request->price,
-                'category' => $request->category,
-                'imageSource' => $newImageName
+                'imageSource' => $newImageName,
+                'category' => $request->category
             ];
             $product->fill($data);
             $product->save();
 
-            return redirect()->back();
+            return response()->json(['status' => true]);
         }
     }
 
@@ -256,7 +170,7 @@ class ProductController extends Controller
 
     public function addProductView(Request $request)
     {
-        return $request->ajax() ? response()->json(['destination' => 'addProduct']) : view('product', ['destination' => 'addProduct']);
+        return response()->json(['destination' => 'addProduct']);
     }
 
     public function detailsProduct(Request $request, $id)

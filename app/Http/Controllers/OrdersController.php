@@ -24,8 +24,7 @@ class OrdersController extends Controller
     public function viewOrder(Request $request, $id)
     {
         $order = Order::with('products')->findOrFail($id);
-
-        return $request->ajax() ? response()->json($order) : view('order', ['order' => $order]);
+        return response()->json($order);
     }
 
     public function checkout(Request $request)

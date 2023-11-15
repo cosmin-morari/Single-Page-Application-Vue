@@ -38,8 +38,7 @@ Route::group(['middleware' => ['customAuth']], function () {
     Route::post('deleteProduct/{id}', [ProductController::class, 'deleteProductFromDB'])->name('deleteProduct');
     Route::post('addProduct', [ProductController::class, 'storeProduct'])->name('addProduct');
     Route::post('viewOrder', [OrdersController::class, 'viewOrder'])->name('viewOrder');
-
-    Route::patch('editProduct/{id}', [ProductController::class, 'update'])->name('update');
+    Route::post('editProduct/{id}', [ProductController::class, 'update'])->name('update');
 });
 
 // SPA
