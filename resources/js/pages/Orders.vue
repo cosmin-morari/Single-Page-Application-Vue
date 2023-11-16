@@ -1,6 +1,5 @@
 <template>
     <a href="#/products">{{ translate.productsPage }}</a>
-
     <table border="1" v-if="orders">
         <thead>
             <tr>
@@ -31,7 +30,6 @@
 export default {
     data(){
         return{
-            translate: '',
             orders:''
         }
     },
@@ -42,11 +40,6 @@ export default {
         }
     },
     created(){
-        fetch('/api/translation')
-                .then(response => response.json())
-                .then(data => {
-                    this.translate = data;
-                })
          fetch('orders')
                 .then(response => response.json())
                 .then(data => {

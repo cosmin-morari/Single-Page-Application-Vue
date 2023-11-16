@@ -16,7 +16,7 @@ class CustomAuth
     public function handle(Request $request, Closure $next): Response
     {
         if (!session('admin')) {
-            return response()->json(['error'=>'You need to log in as administrator.']);
+            return response()->json(['error'=>'You need to log in as administrator.'], 401);
         }
         return $next($request);
     }

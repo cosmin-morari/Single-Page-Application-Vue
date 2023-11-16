@@ -2,10 +2,11 @@
     <div class="container">
         <h3>{{ translate.login }}</h3>
         <input type="text" name="adminMail" class="adminMail" :placeholder="translate.userName" v-model="form.adminMail">
-        <br><br>
-        <input type="password" name="adminPassword" class="adminPassword" :placeholder="translate.password"
-            v-model="form.adminPassword">
-        <br><br>
+        <br>
+        <br>
+        <input type="password" name="adminPassword" class="adminPassword" :placeholder="translate.password" v-model="form.adminPassword">
+        <br>
+        <br>
         <div style="color:red" class="error adminMail">{{ invalidCredentials }}</div>
         <button @click="login" type="submit">{{ translate.login }}</button>
     </div>
@@ -16,7 +17,6 @@
 export default {
     data() {
         return {
-            translate: '',
             form: {
                 adminMail: '',
                 adminPassword: ''
@@ -48,16 +48,11 @@ export default {
     }
     ,
     created() {
-        fetch('/api/translation')
-            .then(response => response.json())
-            .then(data => {
-                this.translate = data
-            }),
         fetch('statusAdmin')
             .then(response => response.json())
             .then(data => {
-                if(data.admin){
-                    window.location.hash = '/products' 
+                if (data.admin) {
+                    window.location.hash = '/products'
                 }
             })
     }

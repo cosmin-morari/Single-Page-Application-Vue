@@ -14,14 +14,18 @@
         <tbody v-for="item in productsIndex" :key="item.id">
             <tr>
                 <td>{{ item.id }} </td>
-                <td><img :src="`http://localhost/training/Single-Page-Application-Vue/storage/app/public/photos/${item.imageSource}`"
-                        alt=""></td>
+                <td>
+                    <img :src="`http://localhost/training/Single-Page-Application-Vue/public/storage/photos/${item.imageSource}`"
+                        alt="">
+                </td>
                 <td>{{ item.title }}</td>
                 <td>{{ item.description }}</td>
                 <td>{{ item.price }}</td>
-                <td><button @click="addToCart(item.id)">{{ translate.addProduct }}</button></td>
+                <td>
+                    <button @click="addToCart(item.id)">{{ translate.addProduct }}</button>
+                    <button @click="detailsProduct(item.id)">{{ translate.actionViewProduct }}</button>
+                </td>
             </tr>
-
         </tbody>
     </table>
     <a href="#/cart">{{ translate.cart }}</a>
@@ -32,8 +36,7 @@
 export default {
     data() {
         return {
-            productsIndex: '',
-            translate: '',
+            productsIndex: ''
         }
     },
     methods: {
@@ -50,17 +53,34 @@ export default {
                 return;
             }
         },
+        async detailsProduct(product) {
+            try {
+                await fetch(`detailsProduct/${product}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                }).then(response => {
+                    if (response.status !== 200) {
+                        throw new Error('Sorry, an error occurred while processing your request.');
+                    }
+                    return response.json();
+                }).then(data => {
+                    console.log(data)
+                    window.data = data;
+                    window.location.hash = '#/detailsProduct';
+                })
+            }
+            catch (err) {
+                console.error(err)
+            }
+        }
     },
     created() {
         fetch('index')
             .then(response => response.json())
             .then(data => {
                 this.productsIndex = data
-            })
-        fetch('/api/translation')
-            .then(response => response.json())
-            .then(data => {
-                this.translate = data
             })
     }
 }

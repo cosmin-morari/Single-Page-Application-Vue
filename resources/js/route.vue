@@ -6,6 +6,7 @@ import Products from './pages/Products.vue';
 import Product from './pages/Product.vue';
 import Orders from './pages/Orders.vue';
 import Order from './pages/Order.vue';
+import DetailsProduct from './pages/DetailsProduct.vue';
 
 
 const routes = {
@@ -15,7 +16,8 @@ const routes = {
     '/products' : Products,
     '/product' : Product,
     '/orders' : Orders,
-    '/order' : Order
+    '/order' : Order,
+    '/detailsProduct' : DetailsProduct
 }
 
 export default {

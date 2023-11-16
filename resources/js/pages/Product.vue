@@ -31,7 +31,6 @@
 export default {
     data() {
         return {
-            translate: '',
             productId: window.productEdit ? window.productEdit : '',
             product: {
                 title: '',
@@ -40,10 +39,49 @@ export default {
                 category: '',
                 file: ''
             },
-            error: ''
+            error: '',
         }
     },
     methods: {
+        addProductComponent() {
+            try {
+                fetch('addProduct')
+                    .then(response => {
+                        if (response.status === 401) {
+                            window.location.hash = '#/products'
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.error) {
+
+                            throw new Error(data.error);
+                        }
+                    })
+            } catch (err) {
+                console.log(err);
+            }
+        },
+        editProductComponent() {
+            if (this.productId) {
+                try {
+                    fetch(`editProductView/${this.productId}`)
+                        .then(response => {
+                            if (response.status === 401) {
+                                window.location.hash = '#/products'
+                            }
+                            return response.json()
+                        })
+                        .then(data => {
+                            if (data.products) {
+                                this.product = data.products
+                            }
+                        })
+                } catch (err) {
+                    console.log(err)
+                }
+            }
+        },
         uploadFile(event) {
             this.file = event.target.files[0];
         },
@@ -55,7 +93,7 @@ export default {
             form.append('category', this.product.category);
             form.append('file', this.file);
             try {
-                const response = await fetch('addProduct', {
+                await fetch('addProduct', {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
@@ -81,7 +119,7 @@ export default {
             form.append('file', this.file);
             form.append('id', productId);
             try {
-                const response = await fetch(`editProduct/${productId}`, {
+                await fetch(`editProduct/${productId}`, {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
@@ -96,32 +134,12 @@ export default {
                         this.error = data.error;
                     })
             } catch (err) {
-                return;
             }
         }
     },
     created() {
-        fetch('/api/translation')
-            .then(response => response.json())
-            .then(data => {
-                this.translate = data
-            })
-        if (this.productId) {
-            fetch(`editProductView/${this.productId}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.products) {
-                        this.product = data.products
-                    }
-                })
-        }
-        fetch('addProduct')
-            .then(response => response.json())
-            .then(data => {
-                if(data.error){
-                    window.location.hash = '#/products'
-                }
-            })
+        this.addProductComponent()
+        this.editProductComponent();
     }
 }
 </script>

@@ -40,11 +40,33 @@
 export default {
     data() {
         return {
-            products: '',
-            translate: ''
+            products: ''
         }
     },
     methods: {
+        async fetchProducts() {
+            try {
+                await fetch('products', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                }).then(response => {
+                    if (response.status === 401) {
+                        window.location.hash = '#/login';
+                    }
+                    return response.json();
+                }).then(data => {
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+                    this.products = data;
+                    window.productEdit = '';
+                });
+            } catch (err) {
+                console.error(err)
+            }
+        },
         async logoutAdmin() {
             try {
                 const response = await fetch('logoutAdmin', {
@@ -78,26 +100,7 @@ export default {
         }
     },
     created() {
-        fetch('products', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            }
-        }).then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    window.location.hash = '/login';
-                } else {
-                    this.products = data;
-                    window.productEdit = '';
-                }
-            }),
-            fetch('/api/translation')
-                .then(response => response.json())
-                .then(data => {
-                    this.translate = data;
-                })
+        this.fetchProducts()
     }
 }
 </script>

@@ -15,8 +15,9 @@
         <tbody v-for="item, key in productsCart" :key="item.id">
             <tr>
                 <td>{{ item.id }} </td>
-                <td><img :src="`http://localhost/training/Single-Page-Application-Vue/storage/app/public/photos/${item.imageSource}`"
-                        alt=""></td>
+                <td>
+                    <img :src="`http://localhost/training/Single-Page-Application-Vue/storage/app/public/photos/${item.imageSource}`" alt="">
+                </td>
                 <td>{{ item.title }}</td>
                 <td>{{ item.description }}</td>
                 <td>{{ item.price }}</td>
@@ -45,7 +46,6 @@ export default {
     data() {
         return {
             productsCart: '',
-            translate: '',
             formData: {
                 quantityInput: '1'
             },
@@ -57,7 +57,6 @@ export default {
         }
     },
     methods: {
-
         async removeProduct(productId) {
             try {
                 const response = await fetch(`deleteProductCart/${productId}`, {
@@ -112,17 +111,10 @@ export default {
         }
     },
     created() {
-
         fetch('cart')
             .then(response => response.json())
             .then(data => {
                 this.productsCart = data;
-            })
-
-        fetch('/api/translation')
-            .then(response => response.json())
-            .then(data => {
-                this.translate = data
             })
     }
 }

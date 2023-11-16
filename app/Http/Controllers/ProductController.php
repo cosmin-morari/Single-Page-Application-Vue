@@ -13,6 +13,7 @@ use App\Http\Requests\ValidateEditProduct;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Mockery\Undefined;
 
 class ProductController extends Controller
 {
@@ -110,37 +111,49 @@ class ProductController extends Controller
         return response()->json(['message' => 'The product has been deleted.']);
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        $id = $request->id;
-        $product = Product::findOrFail($id);
-        $image = $request->file;
-        $newImageName = time() . '-' . $image->getClientOriginalName();
-        $image->move(public_path('storage/photos'), $newImageName);
+        $product = Product::findOrFail($request->id);
 
-        $data = [
-            'title' => $request->title,
-            'description' => $request->description,
-            'price' => $request->price,
-            'category' => $request->category
-        ];
-        $product->fill($data);
-        $product->save();
+        $validator = Validator::make($request->all(), [
+            'title' => 'required',
+            'description' => 'required',
+            'price' => 'required|integer',
+            'file' => 'required|image',
+            'category' => 'required'
+        ]);
+        if (!$validator->passes()) {
+            return response()->json(['status' => 0, 'error' => $validator->errors()->toArray()]);
+        } else {
+            $image = $request->file;
+            $newImageName = time() . '-' . $image->getClientOriginalName();
+            $image->move(public_path('storage/photos'), $newImageName);
 
-        return response()->json(['status' => true]);
+            $data = [
+                'title' => $request->title,
+                'description' => $request->description,
+                'price' => $request->price,
+                'imageSource' => $newImageName,
+                'category' => $request->category
+            ];
+            $product->fill($data);
+            $product->save();
+
+            return response()->json(['status' => true]);
+        }
     }
 
     public function storeProduct(Request $request)
-    {
+    {   
+        
         $product = new Product;
         $validator = Validator::make($request->all(), [
             'title' => 'required',
             'description' => 'required',
             'price' => 'required|integer',
-            'file' => 'required',
+            'file' => 'required|image',
             'category' => 'required'
         ]);
-
         if (!$validator->passes()) {
             return response()->json(['status' => 0, 'error' => $validator->errors()->toArray()]);
         } else {
@@ -170,12 +183,11 @@ class ProductController extends Controller
 
     public function addProductView(Request $request)
     {
-        return response()->json(['destination' => 'addProduct']);
+        return response()->json(session('admin'));
     }
 
     public function detailsProduct(Request $request, $id)
     {
-
         $product = Product::findOrFail($id);
         $category = $product->category;
         $sameCategoryproducts = Product::select('products.*')
@@ -191,7 +203,7 @@ class ProductController extends Controller
             'sameCategoryproducts' => $sameCategoryproducts
         ];
 
-        return $request->ajax() ? response()->json($data) : view('product', ['product' => $product, 'destination' => 'editProduct']);
+        return response()->json($data);
     }
 
     public function translationWords()
